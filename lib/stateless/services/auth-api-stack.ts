@@ -16,8 +16,10 @@ interface AuthApiStackProps extends StackProps {
 export class AuthApiStack extends Stack {
   private signUpFunction: Function;
   private loginFunction: Function;
+  private otpValidateFunction: Function;
   private signUpIntegration: LambdaIntegration;
   private loginIntegration: LambdaIntegration;
+  private otpValidateIntegration: LambdaIntegration;
   constructor(scope: Construct, id: string, props: AuthApiStackProps) {
     super(scope, id, props);
 
@@ -28,14 +30,20 @@ export class AuthApiStack extends Stack {
   }
 
   private createLambdaFunctions(props: AuthApiStackProps) {
-    this.signUpFunction = this.createLambdaFunction('signup');
+    this.signUpFunction = this.createLambdaFunction('signUp');
     this.signUpFunction.addEnvironment(
       'COGNITO_USER_POOL_CLIENT_ID',
       props.cognitoUserPoolClient.userPoolClientId
     );
 
-    this.loginFunction = this.createLambdaFunction('login');
+    this.loginFunction = this.createLambdaFunction('logIn');
     this.loginFunction.addEnvironment(
+      'COGNITO_USER_POOL_CLIENT_ID',
+      props.cognitoUserPoolClient.userPoolClientId
+    );
+
+    this.otpValidateFunction = this.createLambdaFunction('otpValidate');
+    this.otpValidateFunction.addEnvironment(
       'COGNITO_USER_POOL_CLIENT_ID',
       props.cognitoUserPoolClient.userPoolClientId
     );
@@ -44,6 +52,7 @@ export class AuthApiStack extends Stack {
   private createLambdaIntegrations(props: AuthApiStackProps) {
     this.signUpIntegration = new LambdaIntegration(this.signUpFunction);
     this.loginIntegration = new LambdaIntegration(this.loginFunction);
+    this.otpValidateIntegration = new LambdaIntegration(this.otpValidateFunction);
   }
 
   private assignPermissions(props: AuthApiStackProps) {
@@ -62,6 +71,14 @@ export class AuthApiStack extends Stack {
         resources: [props.cognitoUserPool.userPoolArn],
       })
     );
+
+    this.otpValidateFunction.addToRolePolicy(
+      new PolicyStatement({
+        effect: Effect.ALLOW,
+        actions: ['cognito-idp:ConfirmSignUp'],
+        resources: [props.cognitoUserPool.userPoolArn],
+      })
+    );
   }
 
   private createResources(props: AuthApiStackProps): void {
@@ -70,13 +87,16 @@ export class AuthApiStack extends Stack {
 
     const loginResource = props.restApi.root.addResource('login');
     loginResource.addMethod('POST', this.loginIntegration);
+
+    const otpValidateResource = props.restApi.root.addResource('otp-validate');
+    otpValidateResource.addMethod('POST', this.otpValidateIntegration);
   }
 
   private createLambdaFunction(id: string) {
     return new Function(this, id, {
       runtime: Runtime.NODEJS_22_X,
       handler: 'index.handler',
-      code: Code.fromAsset(path.resolve(__dirname, '../../../src/auth', id)),
+      code: Code.fromAsset(path.resolve(__dirname, '../../../src/dist', id)),
     });
   }
 }

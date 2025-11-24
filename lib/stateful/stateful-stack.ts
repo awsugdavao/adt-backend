@@ -6,6 +6,8 @@ import {
   UserPool,
   UserPoolClient,
   UserPoolOperation,
+  VerificationEmailStyle,
+  UserPoolEmail
 } from 'aws-cdk-lib/aws-cognito';
 import path from 'path';
 import { Code, Runtime } from 'aws-cdk-lib/aws-lambda';
@@ -51,6 +53,20 @@ export class StatefulStack extends Stack {
       signInAliases: {
         email: true,
       },
+      autoVerify: {
+        email: true,
+      },
+      userVerification: {
+        emailSubject: 'Verify your email',
+        emailBody:
+          'Hello {username},\n\nYour verification code is: {####}\n\nEnter this code in the app to confirm your account.',
+        emailStyle: VerificationEmailStyle.CODE,
+      },
+      email: UserPoolEmail.withSES({
+        fromEmail: 'hello@awsugdavao.ph',
+        fromName: 'AWS User Group Davao',
+        sesRegion: 'ap-southeast-1',
+      }),
       passwordPolicy: {
         minLength: 8,
         requireDigits: true,
@@ -80,18 +96,18 @@ export class StatefulStack extends Stack {
   }
 
   private createLambdaTriggers(): void {
-    const preSignUpTrigger = new Function(this, 'PreSignUpTrigger', {
+    const postConfirmationTrigger = new Function(this, 'PostConfirmationTrigger', {
       runtime: Runtime.NODEJS_22_X,
       handler: 'index.handler',
       code: Code.fromAsset(
-        path.resolve(__dirname, '../../../src/auth', 'preSignUpTrigger')
+        path.resolve(__dirname, '../../src/dist', 'postConfirmationTrigger')
       ),
       environment: {
         TABLE_NAME: this.dataTable.tableName,
       },
     });
 
-    preSignUpTrigger.addToRolePolicy(
+    postConfirmationTrigger.addToRolePolicy(
       new PolicyStatement({
         effect: Effect.ALLOW,
         actions: ['dynamodb:PutItem'],
@@ -100,8 +116,8 @@ export class StatefulStack extends Stack {
     );
 
     this.adtCognitoUserPool.addTrigger(
-      UserPoolOperation.PRE_SIGN_UP,
-      preSignUpTrigger
+      UserPoolOperation.POST_CONFIRMATION,
+      postConfirmationTrigger
     );
   }
 }

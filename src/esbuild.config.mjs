@@ -2,9 +2,10 @@ import { build } from 'esbuild';
 
 build({
   entryPoints: [
-    './src/auth/signUp.ts',
-    './src/auth/signIn.ts',
-    './src/auth/preSignUpTrigger.ts',
+    './functions/auth/signUp.ts',
+    './functions/auth/logIn.ts',
+    './functions/auth/otpValidate.ts',
+    './functions/auth/postConfirmationTrigger.ts',
   ],
   entryNames: '[name]/index',
   outdir: 'dist',

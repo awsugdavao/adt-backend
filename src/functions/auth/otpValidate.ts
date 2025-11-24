@@ -1,7 +1,7 @@
 import { APIGatewayProxyEventV2 } from 'aws-lambda';
 import {
   CognitoIdentityProviderClient,
-  InitiateAuthCommand,
+  ConfirmSignUpCommand,
 } from '@aws-sdk/client-cognito-identity-provider';
 
 const cognitoClient = new CognitoIdentityProviderClient({
@@ -12,48 +12,31 @@ exports.handler = async (event: APIGatewayProxyEventV2) => {
   try {
     console.log('event', event);
 
-    const { email, password } = JSON.parse(event.body ?? '{}');
+    const { email, code } = JSON.parse(event.body ?? '{}');
 
-    if (!email || !password) {
+    if (!email || !code) {
       return {
         statusCode: 400,
         body: JSON.stringify({ message: 'Missing required fields' }),
       };
     }
 
-    const command = new InitiateAuthCommand({
+    const command = new ConfirmSignUpCommand({
       ClientId: process.env.COGNITO_USER_POOL_CLIENT_ID,
-      AuthFlow: 'USER_PASSWORD_AUTH',
-      AuthParameters: {
-        USERNAME: email,
-        PASSWORD: password,
-      },
+      Username: email,
+      ConfirmationCode: code,
     });
 
     const response = await cognitoClient.send(command);
 
-    const authenticationResult = response.AuthenticationResult;
-    const accessToken = authenticationResult
-      ? authenticationResult.AccessToken
-      : '';
-    const refreshToken = authenticationResult
-      ? authenticationResult.RefreshToken
-      : '';
-    const idToken = authenticationResult ? authenticationResult.IdToken : '';
+    console.log('response', response);
 
     return {
       statusCode: 200,
-      body: JSON.stringify({
-        message: 'User logged in successfully',
-        data: {
-          accessToken,
-          refreshToken,
-          idToken,
-        },
-      }),
+      body: JSON.stringify({ message: 'OTP validated successfully' }),
     };
   } catch (error) {
-    console.error('Error in signup handler:', error);
+    console.error('Error in otp validate handler:', error);
 
     return {
       statusCode: 500,

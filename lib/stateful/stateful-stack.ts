@@ -7,7 +7,7 @@ import {
   UserPoolClient,
   UserPoolOperation,
   VerificationEmailStyle,
-  UserPoolEmail
+  UserPoolEmail,
 } from 'aws-cdk-lib/aws-cognito';
 import path from 'path';
 import { Code, Runtime } from 'aws-cdk-lib/aws-lambda';
@@ -96,16 +96,20 @@ export class StatefulStack extends Stack {
   }
 
   private createLambdaTriggers(): void {
-    const postConfirmationTrigger = new Function(this, 'PostConfirmationTrigger', {
-      runtime: Runtime.NODEJS_22_X,
-      handler: 'index.handler',
-      code: Code.fromAsset(
-        path.resolve(__dirname, '../../src/dist', 'postConfirmationTrigger')
-      ),
-      environment: {
-        TABLE_NAME: this.dataTable.tableName,
-      },
-    });
+    const postConfirmationTrigger = new Function(
+      this,
+      'PostConfirmationTrigger',
+      {
+        runtime: Runtime.NODEJS_22_X,
+        handler: 'index.handler',
+        code: Code.fromAsset(
+          path.resolve(__dirname, '../../src/dist', 'postConfirmationTrigger')
+        ),
+        environment: {
+          TABLE_NAME: this.dataTable.tableName,
+        },
+      }
+    );
 
     postConfirmationTrigger.addToRolePolicy(
       new PolicyStatement({

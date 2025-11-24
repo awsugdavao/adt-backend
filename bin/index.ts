@@ -13,7 +13,7 @@ const localStatefulStack = new StatefulStack(
   app,
   `${process.env.STAGE}StatefulStack`,
   {
-    ...remocalConfig.Stateful
+    ...remocalConfig.Stateful,
   }
 );
 

@@ -1,4 +1,3 @@
-import { StackProps, Stack } from 'aws-cdk-lib/core';
 import * as path from 'path';
 import { UserPool, UserPoolClient } from 'aws-cdk-lib/aws-cognito';
 import { Construct } from 'constructs';
@@ -6,14 +5,15 @@ import { Function } from 'aws-cdk-lib/aws-lambda';
 import { LambdaIntegration, RestApi } from 'aws-cdk-lib/aws-apigateway';
 import { PolicyStatement, Effect } from 'aws-cdk-lib/aws-iam';
 import { Runtime, Code } from 'aws-cdk-lib/aws-lambda';
+import { Stack } from 'aws-cdk-lib/core';
 
-interface AuthApiStackProps extends StackProps {
+interface AuthApiStackProps {
   restApi: RestApi;
   cognitoUserPool: UserPool;
   cognitoUserPoolClient: UserPoolClient;
 }
 
-export class AuthApiStack extends Stack {
+export class AuthApiStack extends Construct {
   private signUpFunction: Function;
   private loginFunction: Function;
   private otpValidateFunction: Function;
@@ -21,10 +21,10 @@ export class AuthApiStack extends Stack {
   private loginIntegration: LambdaIntegration;
   private otpValidateIntegration: LambdaIntegration;
   constructor(scope: Construct, id: string, props: AuthApiStackProps) {
-    super(scope, id, props);
+    super(scope, id);
 
     this.createLambdaFunctions(props);
-    this.createLambdaIntegrations(props);
+    this.createLambdaIntegrations();
     this.assignPermissions(props);
     this.createResources(props);
   }
@@ -49,10 +49,12 @@ export class AuthApiStack extends Stack {
     );
   }
 
-  private createLambdaIntegrations(props: AuthApiStackProps) {
+  private createLambdaIntegrations() {
     this.signUpIntegration = new LambdaIntegration(this.signUpFunction);
     this.loginIntegration = new LambdaIntegration(this.loginFunction);
-    this.otpValidateIntegration = new LambdaIntegration(this.otpValidateFunction);
+    this.otpValidateIntegration = new LambdaIntegration(
+      this.otpValidateFunction
+    );
   }
 
   private assignPermissions(props: AuthApiStackProps) {
@@ -93,9 +95,11 @@ export class AuthApiStack extends Stack {
   }
 
   private createLambdaFunction(id: string) {
+    const stack = Stack.of(this);
     return new Function(this, id, {
       runtime: Runtime.NODEJS_22_X,
       handler: 'index.handler',
+      functionName: `${stack.stackName}-${id}`,
       code: Code.fromAsset(path.resolve(__dirname, '../../../src/dist', id)),
     });
   }

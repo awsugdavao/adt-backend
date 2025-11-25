@@ -1,4 +1,11 @@
-import { Entity, ValidItem, Table, item, string } from 'dynamodb-toolbox';
+import {
+  Entity,
+  ValidItem,
+  Table,
+  item,
+  string,
+  FormattedItem,
+} from 'dynamodb-toolbox';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
 
@@ -21,10 +28,16 @@ const userSchema = item({
   firstName: string().required(),
   lastName: string().required(),
   email: string().required(),
-  createdAt: string().default(new Date().toISOString()).required(),
-  updatedAt: string().default(new Date().toISOString()).required(),
   GSI1PK: string(),
   GSI1SK: string(),
+  GSI2PK: string(),
+  GSI2SK: string(),
+  GSI3PK: string(),
+  GSI3SK: string(),
+  GSI4PK: string(),
+  GSI4SK: string(),
+  GSI5PK: string(),
+  GSI5SK: string(),
 });
 
 export const UserEntity = new Entity({
@@ -40,7 +53,5 @@ export const toResponseDto = (user: ValidItem<typeof UserEntity>) => {
     email: user.email,
     firstName: user.firstName,
     lastName: user.lastName,
-    createdAt: user.createdAt,
-    updatedAt: user.updatedAt,
   };
 };

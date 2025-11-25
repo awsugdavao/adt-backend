@@ -26,6 +26,11 @@ export class Api extends Construct {
   private createApiGateway(): void {
     this.restApi = new RestApi(this, 'ApiGateway', {
       deploy: false,
+      defaultCorsPreflightOptions: {
+        allowOrigins: ['*'],
+        allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+        allowHeaders: ['Content-Type', 'Authorization'],
+      },
     });
   }
 

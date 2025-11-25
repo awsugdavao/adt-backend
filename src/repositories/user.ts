@@ -107,7 +107,9 @@ export class UserRepository {
     }
   }
 
-  async getUsersByRole(role: 'member' | 'volunteer' | 'admin'): Promise<ValidItem<typeof UserEntity>[]> {
+  async getUsersByRole(
+    role: 'member' | 'volunteer' | 'admin'
+  ): Promise<ValidItem<typeof UserEntity>[]> {
     try {
       const result = await userRepository.query({
         partition: 'GSI1',
@@ -126,7 +128,9 @@ export class UserRepository {
     }
   }
 
-  async getUsersByEmail(email: string): Promise<ValidItem<typeof UserEntity>[]> {
+  async getUsersByEmail(
+    email: string
+  ): Promise<ValidItem<typeof UserEntity>[]> {
     try {
       const result = await userRepository.query({
         partition: 'GSI2',
@@ -145,7 +149,9 @@ export class UserRepository {
     }
   }
 
-  async getUsersByFirstName(firstName: string): Promise<ValidItem<typeof UserEntity>[]> {
+  async getUsersByFirstName(
+    firstName: string
+  ): Promise<ValidItem<typeof UserEntity>[]> {
     try {
       const result = await userRepository.query({
         partition: 'GSI3',
@@ -164,7 +170,9 @@ export class UserRepository {
     }
   }
 
-  async getUsersByLastName(lastName: string): Promise<ValidItem<typeof UserEntity>[]> {
+  async getUsersByLastName(
+    lastName: string
+  ): Promise<ValidItem<typeof UserEntity>[]> {
     try {
       const result = await userRepository.query({
         partition: 'GSI4',
@@ -209,9 +217,9 @@ export class UserRepository {
 
       return {
         users: parsedUsers,
-        ...(result.LastEvaluatedKey
-          && { lastEvaluatedKey: result.LastEvaluatedKey }
-        )
+        ...(result.LastEvaluatedKey && {
+          lastEvaluatedKey: result.LastEvaluatedKey,
+        }),
       };
     } catch (error) {
       console.error('Error listing users:', error);

@@ -86,11 +86,7 @@ export class StatefulStack extends Stack {
           'Hello {username},\n\nYour verification code is: {####}\n\nEnter this code in the app to confirm your account.',
         emailStyle: VerificationEmailStyle.CODE,
       },
-      email: UserPoolEmail.withSES({
-        fromEmail: 'hello@awsugdavao.ph',
-        fromName: 'AWS User Group Davao',
-        sesRegion: 'ap-southeast-1',
-      }),
+      email: UserPoolEmail.withCognito(),
       passwordPolicy: {
         minLength: 8,
         requireDigits: true,

@@ -3,14 +3,14 @@ import { EntityRepository, ValidItem } from 'dynamodb-toolbox';
 
 export interface CreateUserInput {
   id: string;
-  role: 'member' | 'volunteer' | 'admin';
+  role: string; // 'member' | 'volunteer' | 'admin';
   email: string;
   firstName: string;
   lastName: string;
 }
 
 export interface UpdateUserInput {
-  role?: 'member' | 'volunteer' | 'admin';
+  role?: string; // 'member' | 'volunteer' | 'admin';
   firstName?: string;
   lastName?: string;
 }

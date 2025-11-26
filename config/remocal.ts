@@ -1,4 +1,5 @@
 const commons = {
+  projectName: 'adt',
   env: {
     account: '442867850698',
     region: 'ap-southeast-1',

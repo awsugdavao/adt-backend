@@ -17,7 +17,7 @@ const userSchema = item({
   PK: string().key(),
   SK: string().key(),
   id: string().required(),
-  role: string().enum('member', 'volunteer', 'admin').required(),
+  role: string().required(),
   firstName: string().required(),
   lastName: string().required(),
   email: string().required(),

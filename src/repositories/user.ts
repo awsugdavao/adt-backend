@@ -34,6 +34,7 @@ export class UserRepository {
         email: input.email,
         firstName: input.firstName,
         lastName: input.lastName,
+        totalPoints: 0,
         GSI1PK: `ROLE#${input.role}`,
         GSI1SK: input.id,
         GSI2PK: `EMAIL#${normalizedEmail}`,

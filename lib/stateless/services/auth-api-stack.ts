@@ -5,15 +5,15 @@ import { Function } from 'aws-cdk-lib/aws-lambda';
 import { LambdaIntegration, RestApi } from 'aws-cdk-lib/aws-apigateway';
 import { PolicyStatement, Effect } from 'aws-cdk-lib/aws-iam';
 import { Runtime, Code } from 'aws-cdk-lib/aws-lambda';
-import { Stack } from 'aws-cdk-lib/core';
+import { NestedStack, NestedStackProps } from 'aws-cdk-lib/core';
 
-interface AuthApiStackProps {
+interface AuthApiStackProps extends NestedStackProps {
   restApi: RestApi;
   cognitoUserPool: UserPool;
   cognitoUserPoolClient: UserPoolClient;
 }
 
-export class AuthApiStack extends Construct {
+export class AuthApiStack extends NestedStack {
   private signUpFunction: Function;
   private loginFunction: Function;
   private otpValidateFunction: Function;
@@ -118,11 +118,9 @@ export class AuthApiStack extends Construct {
   }
 
   private createLambdaFunction(id: string) {
-    const stack = Stack.of(this);
     return new Function(this, id, {
       runtime: Runtime.NODEJS_22_X,
       handler: 'index.handler',
-      functionName: `${stack.stackName}-${id}`,
       code: Code.fromAsset(path.resolve(__dirname, '../../../src/dist', id)),
     });
   }

@@ -1,4 +1,4 @@
-import { Entity, ValidItem, Table, item, string } from 'dynamodb-toolbox';
+import { Entity, ValidItem, Table, item, string, number } from 'dynamodb-toolbox';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
 
@@ -21,16 +21,17 @@ const userSchema = item({
   firstName: string().required(),
   lastName: string().required(),
   email: string().required(),
-  GSI1PK: string(),
-  GSI1SK: string(),
-  GSI2PK: string(),
-  GSI2SK: string(),
-  GSI3PK: string(),
-  GSI3SK: string(),
-  GSI4PK: string(),
-  GSI4SK: string(),
-  GSI5PK: string(),
-  GSI5SK: string(),
+  totalPoints: number().required(),
+  GSI1PK: string().optional(),
+  GSI1SK: string().optional(),
+  GSI2PK: string().optional(),
+  GSI2SK: string().optional(),
+  GSI3PK: string().optional(),
+  GSI3SK: string().optional(),
+  GSI4PK: string().optional(),
+  GSI4SK: string().optional(),
+  GSI5PK: string().optional(),
+  GSI5SK: string().optional(),
 });
 
 export const UserEntity = new Entity({

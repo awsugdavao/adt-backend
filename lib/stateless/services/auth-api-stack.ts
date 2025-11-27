@@ -63,7 +63,9 @@ export class AuthApiStack extends Construct {
     this.otpValidateIntegration = new LambdaIntegration(
       this.otpValidateFunction
     );
-    this.refreshTokenIntegration = new LambdaIntegration(this.refreshTokenFunction);
+    this.refreshTokenIntegration = new LambdaIntegration(
+      this.refreshTokenFunction
+    );
   }
 
   private assignPermissions(props: AuthApiStackProps) {
@@ -110,7 +112,8 @@ export class AuthApiStack extends Construct {
     const otpValidateResource = props.restApi.root.addResource('otp-validate');
     otpValidateResource.addMethod('POST', this.otpValidateIntegration);
 
-    const refreshTokenResource = props.restApi.root.addResource('refresh-token');
+    const refreshTokenResource =
+      props.restApi.root.addResource('refresh-token');
     refreshTokenResource.addMethod('POST', this.refreshTokenIntegration);
   }
 

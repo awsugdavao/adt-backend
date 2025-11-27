@@ -1,4 +1,3 @@
-
 import { APIGatewayProxyEventV2 } from 'aws-lambda';
 import {
   CognitoIdentityProviderClient,

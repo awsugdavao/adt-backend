@@ -16,6 +16,8 @@ import { Function } from 'aws-cdk-lib/aws-lambda';
 
 interface StatefulStackProps extends StackProps {
   stage: string;
+  fromEmail: string;
+  fromName: string;
 }
 
 export class StatefulStack extends Stack {
@@ -26,7 +28,7 @@ export class StatefulStack extends Stack {
     super(scope, id, props);
 
     this.dataTable = this.createDynamoDbTable();
-    this.adtCognitoUserPool = this.createCognitoUserPool();
+    this.adtCognitoUserPool = this.createCognitoUserPool(props);
     this.adtCognitoUserPoolClient = this.createCognitoUserPoolClient();
     this.createLambdaTriggers();
   }
@@ -71,7 +73,7 @@ export class StatefulStack extends Stack {
     return table;
   }
 
-  private createCognitoUserPool(): UserPool {
+  private createCognitoUserPool(props: StatefulStackProps): UserPool {
     return new UserPool(this, 'AdtCognitoUserPool', {
       selfSignUpEnabled: true,
       signInAliases: {
@@ -86,7 +88,12 @@ export class StatefulStack extends Stack {
           'Hello {username},\n\nYour verification code is: {####}\n\nEnter this code in the app to confirm your account.',
         emailStyle: VerificationEmailStyle.CODE,
       },
-      email: UserPoolEmail.withCognito(),
+      email: UserPoolEmail.withSES({
+        fromEmail: props.fromEmail,
+        fromName: props.fromName,
+        sesRegion: this.region,
+        sesVerifiedDomain: 'awsugdavao.ph',
+      }),
       passwordPolicy: {
         minLength: 8,
         requireDigits: true,

@@ -1,3 +1,5 @@
+import 'dotenv/config';
+
 const commons = {
   projectName: 'adt',
   env: {
@@ -5,6 +7,8 @@ const commons = {
     region: 'ap-southeast-1',
   },
   stage: process.env.STAGE || 'local',
+  fromEmail: process.env.FROM_EMAIL || 'hello@awsugdavao.ph',
+  fromName: process.env.FROM_EMAIL_NAME || 'AWS User Group Davao',
 };
 
 const Stateful = {

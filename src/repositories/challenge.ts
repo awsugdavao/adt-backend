@@ -52,7 +52,9 @@ export class ChallengeRepository {
     }
   }
 
-  async getChallengeById(id: string): Promise<ValidItem<typeof ChallengeEntity> | null> {
+  async getChallengeById(
+    id: string
+  ): Promise<ValidItem<typeof ChallengeEntity> | null> {
     try {
       const result = await challengeRepository.get({
         PK: `CHALLENGE#${id}`,

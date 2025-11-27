@@ -5,6 +5,7 @@ import {
   item,
   string,
   number,
+  boolean,
 } from 'dynamodb-toolbox';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
@@ -20,15 +21,15 @@ const table = new Table({
   ),
 });
 
-const userSchema = item({
+const challengeSchema = item({
   PK: string().key(),
   SK: string().key(),
   id: string().required(),
-  role: string().required(),
-  firstName: string().required(),
-  lastName: string().required(),
-  email: string().required(),
-  totalPoints: number().required(),
+  title: string().required(),
+  description: string().required(),
+  pointsReward: number().required(),
+  createdBy: string().required(),
+  isActive: boolean().required(),
   GSI1PK: string().optional(),
   GSI1SK: string().optional(),
   GSI2PK: string().optional(),
@@ -41,18 +42,23 @@ const userSchema = item({
   GSI5SK: string().optional(),
 });
 
-export const UserEntity = new Entity({
-  name: 'User',
+export const ChallengeEntity = new Entity({
+  name: 'Challenge',
   table,
-  schema: userSchema,
+  schema: challengeSchema,
+  timestamps: true, // Enables created and modified timestamps
 });
 
-export const toResponseDto = (user: ValidItem<typeof UserEntity>) => {
+export const toResponseDto = (challenge: ValidItem<typeof ChallengeEntity>) => {
   return {
-    id: user.id,
-    role: user.role,
-    email: user.email,
-    firstName: user.firstName,
-    lastName: user.lastName,
+    id: challenge.id,
+    title: challenge.title,
+    description: challenge.description,
+    pointsReward: challenge.pointsReward,
+    createdBy: challenge.createdBy,
+    isActive: challenge.isActive,
+    // Access the created timestamp (automatically added by dynamodb-toolbox)
+    created: challenge.created,
+    // Also available: challenge.modified for last modified timestamp
   };
 };

@@ -1,4 +1,11 @@
-import { Entity, ValidItem, Table, item, string, number } from 'dynamodb-toolbox';
+import {
+  Entity,
+  ValidItem,
+  Table,
+  item,
+  string,
+  number,
+} from 'dynamodb-toolbox';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
 

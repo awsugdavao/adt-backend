@@ -20,7 +20,9 @@ export interface UpdateChallengeInput {
 const challengeRepository = new EntityRepository(ChallengeEntity);
 
 export class ChallengeRepository {
-  async createChallenge(input: CreateChallengeInput): Promise<ValidItem<typeof ChallengeEntity>> {
+  async createChallenge(
+    input: CreateChallengeInput
+  ): Promise<ValidItem<typeof ChallengeEntity>> {
     try {
       const createdAt = new Date().toISOString();
 
@@ -50,14 +52,18 @@ export class ChallengeRepository {
     }
   }
 
-  async updateChallenge(id: string, input: UpdateChallengeInput): Promise<ValidItem<typeof ChallengeEntity>> {
+  async updateChallenge(
+    id: string,
+    input: UpdateChallengeInput
+  ): Promise<ValidItem<typeof ChallengeEntity>> {
     try {
       const updatedData = {
         PK: `CHALLENGE#${id}`,
         SK: 'METADATA',
         ...input,
       };
-      const { ToolboxItem: challenge } = await challengeRepository.update(updatedData);
+      const { ToolboxItem: challenge } =
+        await challengeRepository.update(updatedData);
       const { parsedItem } = challengeRepository.parse(challenge);
 
       return parsedItem;
@@ -81,7 +87,9 @@ export class ChallengeRepository {
     }
   }
 
-  async getChallengesByCreatedBy(createdBy: string): Promise<ValidItem<typeof ChallengeEntity>[]> {
+  async getChallengesByCreatedBy(
+    createdBy: string
+  ): Promise<ValidItem<typeof ChallengeEntity>[]> {
     try {
       const result = await challengeRepository.query({
         partition: 'GSI1',
@@ -100,17 +108,22 @@ export class ChallengeRepository {
     }
   }
 
-  async listActiveChallengesByDate(limit = 50, startKey?: string, sort = 'desc'): Promise<{
+  async listActiveChallengesByDate(
+    limit = 50,
+    startKey?: string,
+    sort = 'desc'
+  ): Promise<{
     challenges: ValidItem<typeof ChallengeEntity>[];
     lastEvaluatedKey?: Record<string, string>;
   }> {
     try {
-      const result = await challengeRepository.query({
-        partition: 'GSI2',
-        range: { beginsWith: 'CHALLENGE#ACTIVE' },
-        sort: 'GSI2SK',
-        direction: sort,
-      },
+      const result = await challengeRepository.query(
+        {
+          partition: 'GSI2',
+          range: { beginsWith: 'CHALLENGE#ACTIVE' },
+          sort: 'GSI2SK',
+          direction: sort,
+        },
         {
           limit,
           startKey,
@@ -134,15 +147,19 @@ export class ChallengeRepository {
     }
   }
 
-  async listChallenges(limit = 50, startKey?: string): Promise<{
+  async listChallenges(
+    limit = 50,
+    startKey?: string
+  ): Promise<{
     challenges: ValidItem<typeof ChallengeEntity>[];
     lastEvaluatedKey?: Record<string, string>;
   }> {
     try {
-      const result = await challengeRepository.query({
-        partition: 'GSI5',
-        range: { beginsWith: 'CHALLENGE#COLLECTION' },
-      },
+      const result = await challengeRepository.query(
+        {
+          partition: 'GSI5',
+          range: { beginsWith: 'CHALLENGE#COLLECTION' },
+        },
         {
           limit,
           startKey,

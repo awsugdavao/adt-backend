@@ -5,6 +5,8 @@ const commons = {
     region: 'ap-southeast-1',
   },
   stage: 'dev',
+  fromEmail: 'dev@awsugdavao.ph',
+  fromName: 'Dev AWS User Group Davao',
 };
 
 const Stateful = {

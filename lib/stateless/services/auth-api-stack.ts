@@ -17,9 +17,11 @@ export class AuthApiStack extends Construct {
   private signUpFunction: Function;
   private loginFunction: Function;
   private otpValidateFunction: Function;
+  private refreshTokenFunction: Function;
   private signUpIntegration: LambdaIntegration;
   private loginIntegration: LambdaIntegration;
   private otpValidateIntegration: LambdaIntegration;
+  private refreshTokenIntegration: LambdaIntegration;
   constructor(scope: Construct, id: string, props: AuthApiStackProps) {
     super(scope, id);
 
@@ -47,6 +49,12 @@ export class AuthApiStack extends Construct {
       'COGNITO_USER_POOL_CLIENT_ID',
       props.cognitoUserPoolClient.userPoolClientId
     );
+
+    this.refreshTokenFunction = this.createLambdaFunction('refreshToken');
+    this.refreshTokenFunction.addEnvironment(
+      'COGNITO_USER_POOL_CLIENT_ID',
+      props.cognitoUserPoolClient.userPoolClientId
+    );
   }
 
   private createLambdaIntegrations() {
@@ -54,6 +62,9 @@ export class AuthApiStack extends Construct {
     this.loginIntegration = new LambdaIntegration(this.loginFunction);
     this.otpValidateIntegration = new LambdaIntegration(
       this.otpValidateFunction
+    );
+    this.refreshTokenIntegration = new LambdaIntegration(
+      this.refreshTokenFunction
     );
   }
 
@@ -81,6 +92,14 @@ export class AuthApiStack extends Construct {
         resources: [props.cognitoUserPool.userPoolArn],
       })
     );
+
+    this.refreshTokenFunction.addToRolePolicy(
+      new PolicyStatement({
+        effect: Effect.ALLOW,
+        actions: ['cognito-idp:RefreshToken'],
+        resources: [props.cognitoUserPool.userPoolArn],
+      })
+    );
   }
 
   private createResources(props: AuthApiStackProps): void {
@@ -92,6 +111,10 @@ export class AuthApiStack extends Construct {
 
     const otpValidateResource = props.restApi.root.addResource('otp-validate');
     otpValidateResource.addMethod('POST', this.otpValidateIntegration);
+
+    const refreshTokenResource =
+      props.restApi.root.addResource('refresh-token');
+    refreshTokenResource.addMethod('POST', this.refreshTokenIntegration);
   }
 
   private createLambdaFunction(id: string) {

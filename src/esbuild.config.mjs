@@ -6,6 +6,7 @@ build({
     './functions/auth/logIn.ts',
     './functions/auth/otpValidate.ts',
     './functions/auth/postConfirmationTrigger.ts',
+    './functions/auth/refreshToken.ts',
   ],
   entryNames: '[name]/index',
   outdir: 'dist',

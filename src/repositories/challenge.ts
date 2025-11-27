@@ -52,19 +52,63 @@ export class ChallengeRepository {
     }
   }
 
+  async getChallengeById(id: string): Promise<ValidItem<typeof ChallengeEntity> | null> {
+    try {
+      const result = await challengeRepository.get({
+        PK: `CHALLENGE#${id}`,
+        SK: 'METADATA',
+      });
+
+      if (!result.Item) {
+        return null;
+      }
+
+      const { parsedItem } = challengeRepository.parse(result.Item);
+      return parsedItem;
+    } catch (error) {
+      console.error('Error getting challenge by id:', error);
+      throw error;
+    }
+  }
+
   async updateChallenge(
     id: string,
     input: UpdateChallengeInput
   ): Promise<ValidItem<typeof ChallengeEntity>> {
     try {
-      const updatedData = {
+      // Handle GSI2 index updates when isActive changes
+      let gsi2Update: { GSI2PK?: string; GSI2SK?: string } = {};
+
+      if (input.isActive !== undefined) {
+        const challenge = await this.getChallengeById(id);
+        if (!challenge) {
+          throw new Error(`Challenge with id ${id} not found`);
+        }
+
+        if (input.isActive === true) {
+          gsi2Update = {
+            GSI2PK: `CHALLENGE#ACTIVE`,
+            GSI2SK: `${challenge.created}#${id}`,
+          };
+        } else {
+          // Remove GSI2PK and GSI2SK when deactivating
+          gsi2Update = {
+            GSI2PK: undefined,
+            GSI2SK: undefined,
+          };
+        }
+      }
+
+      const updateData = {
         PK: `CHALLENGE#${id}`,
         SK: 'METADATA',
         ...input,
+        ...gsi2Update,
       };
-      const { ToolboxItem: challenge } =
-        await challengeRepository.update(updatedData);
-      const { parsedItem } = challengeRepository.parse(challenge);
+
+      const { ToolboxItem: updatedChallenge } =
+        await challengeRepository.update(updateData);
+      const { parsedItem } = challengeRepository.parse(updatedChallenge);
 
       return parsedItem;
     } catch (error) {
